@@ -15,13 +15,9 @@ def rename_axis(df: pd.DataFrame, mapper: dict) -> pd.DataFrame:
     
     return df
 
-def interval_size(bidirectional: bool, search_range: int, base_cpg_loc: int) -> Tuple[int, int]:
-    if bidirectional:
-        start_loc, stop_loc = base_cpg_loc - search_range, base_cpg_loc + search_range
+def interval_size(search_range: int, base_cpg_loc: int) -> Tuple[int, int]:
     
-    else:
-        start_loc, stop_loc = base_cpg_loc, base_cpg_loc + search_range
-        
+    start_loc, stop_loc = base_cpg_loc, base_cpg_loc + search_range    
     return start_loc, stop_loc
 
 def check_cores_number(process_number: int) -> None:
