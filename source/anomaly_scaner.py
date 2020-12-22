@@ -1,4 +1,3 @@
-from typing import List
 import multiprocessing
 
 import pandas as pd
@@ -7,15 +6,13 @@ from tqdm import tqdm
 from source.utils import rename_axis, interval_size
 
 class AnomalyScaner:
-    def __init__(self, mynorm: pd.DataFrame, mynorm_std: pd.DataFrame, search_range: int, bidirectional: bool, annotations: pd.DataFrame, pairs: bool):
-        self.bidirectional = bidirectional
+    def __init__(self, mynorm: pd.DataFrame, mynorm_std: pd.DataFrame, search_range: int, annotations: pd.DataFrame):
         self.search_range = search_range
         self.annotations = annotations
         self.mynorm_std = mynorm_std
         self.mynorm = mynorm
-        self.pairs = pairs
     
-    def search_for_anomalies(self, chromosome_cpg_collection: List[pd.Series]) -> pd.DataFrame:
+    def search_for_anomalies(self, chromosome_cpg_collection: pd.Series) -> pd.DataFrame:
         batch = []
         
         for cpg in tqdm(chromosome_cpg_collection.index, desc=multiprocessing.current_process().name):
@@ -24,7 +21,7 @@ class AnomalyScaner:
             base_cpg_loc = chromosome_cpg_collection.loc[cpg]
             
             # Calculate interval size
-            start_loc, stop_loc = interval_size(self.bidirectional, self.search_range, base_cpg_loc)
+            start_loc, stop_loc = interval_size(self.search_range, base_cpg_loc)
 
             # Find CpG in nearby
             cpg_in_range = chromosome_cpg_collection[(chromosome_cpg_collection < stop_loc) & 
@@ -54,16 +51,12 @@ class AnomalyScaner:
                 
                 # Count distance
                 cpg_in_range["Distance"] = cpg_in_range["Nearby CpG position"] - cpg_in_range["Base CpG position"]
-                                                        
-                if self.pairs:
-                    cpg_in_range = cpg_in_range[(cpg_in_range["Delta"].abs() > 0.3)]
+                cpg_in_range = cpg_in_range[(cpg_in_range["Delta"].abs().round(2) > 0.3)]
+                if not cpg_in_range.empty:
                     if cpg_in_range.shape[0] > 1:
                         cpg_in_range = cpg_in_range[cpg_in_range["Distance"] == cpg_in_range["Distance"].min()]
                     batch.append(cpg_in_range)
-
-                else:
-                    if (cpg_in_range["Delta"].abs() > 0.3).any():
-                        batch.append(cpg_in_range)
+                    
                         
         batch = pd.concat(batch, axis=0, sort=False)
         return batch
