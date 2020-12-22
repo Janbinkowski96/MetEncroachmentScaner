@@ -19,12 +19,15 @@ class DataProcessor:
         mynorm = pd.read_csv(mynorm_path, index_col=0, encoding="latin1")
         self.mynorm = mynorm.mean(axis=1).to_frame(name="beta-values")
         self.mynorm_std = mynorm.std(axis=1).to_frame(name="beta-values std")
-        
+            
     def select_cpg(self) -> None:
         mynorm_cpg = set(self.mynorm.index)
         overlapped = set.intersection(mynorm_cpg, set(self.manifest.index))
         self.manifest = self.manifest.loc[overlapped, :]
-        
+    
+    def load_islands(self):
+        return pd.read_csv("resources/hg19/Annotated_islands.csv", index_col=0)
+     
     def split_per_chromosome(self) -> None:
         """Function return list of dfs with CpGs and MAPINFO per chromosome"""
         cpg_per_chr = []
