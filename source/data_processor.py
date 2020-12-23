@@ -1,6 +1,8 @@
 import pandas as pd
 from tqdm import tqdm
 
+from .utils import create_path
+
 class DataProcessor:
     def __init__(self, manifest_type):
         self.manifest_type = manifest_type
@@ -8,7 +10,8 @@ class DataProcessor:
         self.mynorm_std = None
         self.manifest = None
         self.mynorm = None
-                
+        self.raw_mynorm = None
+        
     def set_manifest(self) -> None:
         if self.manifest_type == "E":
             self.manifest = pd.read_csv("resources/EPIC/EPIC.csv", index_col=0, low_memory=False)
@@ -16,9 +19,9 @@ class DataProcessor:
             self.manifest = pd.read_csv("resources/450K/450K.csv", index_col=0, low_memory=False)
     
     def load_mynorm(self, mynorm_path: str) -> None:
-        mynorm = pd.read_csv(mynorm_path, index_col=0, encoding="latin1")
-        self.mynorm = mynorm.mean(axis=1).to_frame(name="beta-values")
-        self.mynorm_std = mynorm.std(axis=1).to_frame(name="beta-values std")
+        self.raw_mynorm = pd.read_csv(mynorm_path, index_col=0, encoding="latin1") # TODO to optimize
+        self.mynorm = self.raw_mynorm.mean(axis=1).to_frame(name="beta-values")
+        self.mynorm_std = self.raw_mynorm.std(axis=1).to_frame(name="beta-values std")
             
     def select_cpg(self) -> None:
         mynorm_cpg = set(self.mynorm.index)
@@ -37,7 +40,11 @@ class DataProcessor:
             cpg_per_chr.append(cgs)
     
         self.cpg_per_chr = cpg_per_chr
-        
+    
+    def export_to_csv(df: pd.DataFrame, path) -> None:
+        path = create_path(path, name="CpG_in_island.csv")
+        df.to_csv(path)
+     
     @staticmethod
     def annotate(df: pd.DataFrame, annotations: pd.DataFrame) -> pd.DataFrame:
         """Function to annotate base CpG and nearby CpG"""
@@ -54,3 +61,4 @@ class DataProcessor:
 
         df = df.sort_values(by=["Base CpG: CHR", "Base CpG: MAPINFO"])
         return df
+    

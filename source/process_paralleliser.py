@@ -1,15 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Dec  1 09:44:58 2020
-
-@author: janbinkowski
-"""
-
 from typing import Callable
 import multiprocessing as mp
 
-class Process:
+class ParallelProcess:
     def __init__(self, object_to_process: list, number_of_process: int) -> None:
         self.object_to_process = object_to_process
         self.number_of_process = number_of_process

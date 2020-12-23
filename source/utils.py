@@ -1,8 +1,9 @@
 import os
 import multiprocessing
-from typing import Tuple
+from contextlib import suppress
 
 import pandas as pd
+
 
 def rename_axis(df: pd.DataFrame, mapper: dict) -> pd.DataFrame:
     """Function to rename dataframe axis"""
@@ -15,15 +16,17 @@ def rename_axis(df: pd.DataFrame, mapper: dict) -> pd.DataFrame:
     
     return df
 
-def interval_size(search_range: int, base_cpg_loc: int) -> Tuple[int, int]:
-    
-    start_loc, stop_loc = base_cpg_loc, base_cpg_loc + search_range    
-    return start_loc, stop_loc
 
 def check_cores_number(process_number: int) -> None:
     available_cpu = multiprocessing.cpu_count()
     if process_number > available_cpu:
         raise Exception("Selected number of processes exceeds the number of available cores.")
 
-def create_path(path: str) -> str:
-    return os.path.join(path, "report.csv")
+
+def create_path(path: str, name="report.csv") -> str:
+    return os.path.join(path, name)
+
+
+def create_dir(path:str, filename: str) -> None:
+    with suppress(FileExistsError):
+        os.mkdir(create_path(path, filename))
