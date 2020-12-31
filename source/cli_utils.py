@@ -1,5 +1,6 @@
 import click
 
+
 def print_help(ctx, param, value) -> None:
     """Function to print help msg if no arguments passed into cli"""
     if not value or not param:
@@ -16,7 +17,8 @@ def check_flags(ctx, my_norm, sample_sheet, output_directory) -> None:
         missing_args = " and ".join(missing_args)
         click.echo(click.style(f"Missing option '{missing_args}', use --help / -h to print options.", bold=True))
         ctx.exit()
-        
+
+
 def break_(msg: str) -> None:
     click.echo(click.style(msg, bold=True))
     sys.exit(-1)
