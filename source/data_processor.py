@@ -14,15 +14,25 @@ class DataProcessor:
         self.manifest = None
         self.mynorm = None
 
-
     def set_manifest(self) -> None:
         if self.manifest_type == "E":
             self.manifest = pd.read_csv("resources/EPIC/EPIC.csv", index_col=0, low_memory=False)
         else:
             self.manifest = pd.read_csv("resources/450K/450K.csv", index_col=0, low_memory=False)
 
-    def load_mynorm(self, mynorm_path: str) -> None:
-        self.raw_mynorm = pd.read_csv(mynorm_path, index_col=0, encoding="latin1")  # TODO to optimize
+    @staticmethod
+    def first_load(mynorm_path: str) -> dict:
+        df = pd.read_csv(mynorm_path, nrows=5)
+
+        dtypes = df.dtypes
+        col_names = dtypes.index
+        types = [i.name for i in dtypes.values]
+        column_types = dict(zip(col_names, types))
+
+        return column_types
+
+    def load_mynorm(self, mynorm_path: str, column_types: dict) -> None:
+        self.raw_mynorm = pd.read_csv(mynorm_path, index_col=0, encoding="latin1", sep=" ", dtype=column_types)
         self.mynorm = self.raw_mynorm.mean(axis=1).to_frame(name="beta-values")
         self.mynorm_std = self.raw_mynorm.std(axis=1).to_frame(name="beta-values std")
 
