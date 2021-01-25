@@ -26,7 +26,8 @@ def cli(ctx, data_type, input_file, out, search_range, processes_number) -> None
 
     data_processor = DataProcessor(manifest_type=data_type)
     data_processor.set_manifest()
-    data_processor.load_mynorm(mynorm_path=input_file)
+    types = data_processor.first_load(input_file)
+    data_processor.load_mynorm(mynorm_path=input_file, column_types=types)
 
     data_processor.select_cpg()
     data_processor.split_per_chromosome()
@@ -44,13 +45,14 @@ def cli(ctx, data_type, input_file, out, search_range, processes_number) -> None
     file_path = create_path(out)
     selected.to_csv(file_path)
 
-    visualization = IslandAnalyzer(cpgs=selected, mynorm=data_processor.mynorm, manifest=data_processor.manifest)
-    visualization.select_islands()
+    #visualization = IslandAnalyzer(cpgs=selected, mynorm=data_processor.mynorm, manifest=data_processor.manifest)
+    #visualization.select_islands()
 
-    create_dir(out, "Plots")
-    visualization.find_related_island()
-    visualization.plot(data_processor.raw_mynorm)
+    #create_dir(out, "Plots")
+    #visualization.find_related_island()
+    #visualization.plot(data_processor.raw_mynorm)
 
 
 if __name__ == '__main__':
     cli()
+
