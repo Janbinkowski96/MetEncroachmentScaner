@@ -24,8 +24,9 @@ class IslandCollector:
 
     @property
     def empty(self) -> bool:
-        if self.related_islands.empty:
 
+        if self.related_islands.empty:
             return True
+
         else:
             return False
