@@ -2,9 +2,8 @@ import pandas as pd
 import click
 
 from source.cli_utils import print_help, check_flags, print_
-from source.utils import check_cores_number, create_path, create_dir
+from source.utils import check_cores_number, create_path
 from source.process_paralleliser import ParallelProcess
-from source.island_analyzer import IslandAnalyzer
 from source.data_processor import DataProcessor
 from source.anomaly_scaner import AnomalyScaner
 
@@ -45,14 +44,6 @@ def cli(ctx, data_type, input_file, out, search_range, processes_number) -> None
     file_path = create_path(out)
     selected.to_csv(file_path)
 
-    #visualization = IslandAnalyzer(cpgs=selected, mynorm=data_processor.mynorm, manifest=data_processor.manifest)
-    #visualization.select_islands()
-
-    #create_dir(out, "Plots")
-    #visualization.find_related_island()
-    #visualization.plot(data_processor.raw_mynorm)
-
 
 if __name__ == '__main__':
     cli()
-
